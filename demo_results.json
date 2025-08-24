@@ -1,0 +1,32 @@
+{
+  "completed": "2025-08-24T20:11:15.356967",
+  "total_time": 1.203212,
+  "tests": [
+    {
+      "name": "Minicampus",
+      "success": true,
+      "time": 0.30071449279785156
+    },
+    {
+      "name": "Video",
+      "success": true,
+      "time": 0.3007979393005371
+    },
+    {
+      "name": "NoCode",
+      "success": true,
+      "time": 0.30081677436828613
+    },
+    {
+      "name": "Avatar",
+      "success": true,
+      "time": 0.3006775379180908
+    }
+  ],
+  "success_rate": "4/4",
+  "qwen3_stats": {
+    "calls": 4,
+    "tokens": 54
+  },
+  "status": "PRODUCTION_READY"
+}
