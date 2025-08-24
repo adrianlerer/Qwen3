@@ -1,0 +1,40 @@
+# Integridai Hybrid AI System Requirements
+# Sistema Híbrido de IA Integridai - Dependencias
+
+# Core AI Libraries
+torch>=2.0.0
+transformers>=4.51.0
+openai>=1.0.0
+requests>=2.28.0
+
+# Web Interface  
+streamlit>=1.28.0
+plotly>=5.15.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+
+# Async and Performance
+asyncio
+aiohttp>=3.8.0
+
+# Data Processing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Utilities
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+typing-extensions>=4.0.0
+
+# Development Tools (optional)
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
+
+# Optional: For advanced NLP analysis
+# nltk>=3.8.0
+# spacy>=3.6.0
+
+# Optional: For enhanced UI
+# streamlit-chat>=0.1.0
+# streamlit-elements>=0.1.0
