@@ -1,0 +1,245 @@
+# Integridai Hybrid AI System - Model Configuration
+# Sistema Híbrido Integridai - Configuración de Modelos
+
+# Model serving configuration for all AI providers
+# Configuración de servicio de modelos para todos los proveedores de IA
+
+models:
+  # OpenAI GPT-4 Configuration
+  openai-gpt4:
+    provider: "openai"
+    model_name: "gpt-4"
+    api_base: "https://api.openai.com/v1"
+    max_tokens: 4096
+    temperature: 0.7
+    timeout: 30
+    retry_attempts: 3
+    rate_limit:
+      requests_per_minute: 200
+      tokens_per_minute: 40000
+    cost_per_1k_tokens: 0.03
+    best_for:
+      - "empathetic_responses"
+      - "character_consistency" 
+      - "complex_ethical_reasoning"
+    characters:
+      - "catalina"
+      - "auditor"
+
+  # Kimi-K2 (Moonshot AI) Configuration  
+  kimi-k2:
+    provider: "kimi_k2"
+    model_name: "moonshot-v1-128k"
+    api_base: "https://api.moonshot.cn/v1"
+    max_tokens: 4096
+    temperature: 0.6  # Recommended by Kimi docs
+    timeout: 30
+    retry_attempts: 3
+    context_length: 128000
+    rate_limit:
+      requests_per_minute: 100
+      tokens_per_minute: 50000
+    cost_per_1k_tokens: 0.023
+    best_for:
+      - "agentic_scenarios"
+      - "complex_reasoning"
+      - "long_context"
+      - "tool_calling"
+    characters:
+      - "alexis"
+      - "ricardo_corrupt"
+      - "sofia_enabler" 
+      - "marcos_facilitator"
+
+  # Qwen3 Local Configuration
+  qwen3-local:
+    provider: "qwen3"
+    model_path: "Qwen/Qwen3-8B-Instruct"
+    device_map: "auto"
+    torch_dtype: "auto"
+    max_tokens: 2048
+    temperature: 0.7
+    enable_thinking_mode: true
+    timeout: 10
+    cost_per_1k_tokens: 0.0  # Local model, no API cost
+    hardware_requirements:
+      min_vram: "16GB"
+      recommended_vram: "24GB"
+      min_ram: "32GB"
+    best_for:
+      - "real_time_training"
+      - "cost_effective_deployment"
+      - "thinking_mode_reasoning"
+      - "offline_capabilities"
+    characters:
+      - "mentor"
+      - "catalina"  # fallback
+
+  # NEW: Grok 2.5 Configuration (xAI)
+  grok-2.5:
+    provider: "grok_2_5"
+    model_name: "xai-org/grok-2.5"
+    serving_engine: "sglang"
+    api_base: "http://localhost:30000/v1"  # SGLang server endpoint
+    max_tokens: 2048
+    temperature: 0.3  # Lower for verification tasks
+    timeout: 30
+    retry_attempts: 2
+    tensor_parallel: 8  # TP=8 for multi-GPU deployment
+    quantization: "bf16"  # or "fp8" for memory optimization
+    
+    # Hardware requirements for Grok 2.5
+    hardware_requirements:
+      min_gpus: 8
+      min_vram_per_gpu: "40GB"
+      recommended_gpus: 8
+      recommended_vram_per_gpu: "80GB"
+      min_disk_space: "500GB"
+      min_ram: "256GB"
+    
+    # SGLang serving configuration
+    sglang_config:
+      host: "0.0.0.0"
+      port: 30000
+      worker: 1
+      tp_size: 8
+      quantization: "bf16"
+      disable_cuda_graph: false
+      mem_fraction_static: 0.88
+      context_length: 131072
+    
+    # License compliance (Grok 2 Community License)
+    license:
+      name: "Grok 2 Community License"
+      attribution_required: true
+      attribution_text: "Powered by xAI (Grok 2.5)"
+      restrictions:
+        allow_training_use_of_outputs: false
+        allow_fine_tuning: false
+        requires_attribution: true
+        commercial_use: true
+    
+    cost_per_1k_tokens: 0.0  # Local deployment, compute cost only
+    
+    best_for:
+      - "fact_checking"
+      - "verification_tasks"
+      - "cross_model_arbitration"
+      - "legal_risk_assessment"
+      - "corruption_detection"
+    
+    characters:
+      - "inspector_grok"
+    
+    # Verification-specific configuration
+    verification_config:
+      confidence_threshold: 0.7
+      max_claims_per_check: 10
+      enable_legal_risk_analysis: true
+      enable_corruption_flagging: true
+      response_format: "structured_json"
+
+# Model routing rules
+routing:
+  default_provider: "qwen3-local"
+  
+  # Character-based routing
+  character_routing:
+    catalina: "openai-gpt4"
+    mentor: "qwen3-local"  
+    auditor: "openai-gpt4"
+    alexis: "kimi-k2"
+    ricardo_corrupt: "kimi-k2"
+    sofia_enabler: "kimi-k2"
+    marcos_facilitator: "kimi-k2"
+    inspector_grok: "grok-2.5"
+  
+  # Risk-based routing override
+  risk_based_routing:
+    corruption_risk_high: "grok-2.5"  # Route to Grok for verification
+    corruption_risk_critical: "grok-2.5"
+    legal_risk_detected: "grok-2.5"
+    
+  # Fallback chain
+  fallback_chain:
+    - "qwen3-local"    # First fallback (local, always available)
+    - "kimi-k2"        # Second fallback (if API available)
+    - "openai-gpt4"    # Third fallback (if API available)
+    # Note: Grok not in fallback chain due to specialized use case
+
+# Verification workflow configuration  
+verification:
+  enabled: true
+  
+  # When to trigger verification
+  triggers:
+    corruption_risk_level: ["high", "critical"]
+    corrupt_characters: ["ricardo_corrupt", "sofia_enabler", "marcos_facilitator"]
+    user_seeking_validation: true
+    legal_claims_detected: true
+    
+  # Cross-check configuration
+  cross_check:
+    models: ["grok-2.5"]
+    confidence_threshold: 0.8
+    max_claims: 7
+    timeout: 15
+    
+  # Post-response verification
+  post_verification:
+    fact_check_enabled: true
+    inconsistency_detection: true
+    legal_risk_analysis: true
+    corruption_flag_detection: true
+
+# Performance monitoring
+monitoring:
+  metrics:
+    - "response_time_p95"
+    - "response_time_p99" 
+    - "quality_score_avg"
+    - "corruption_resistance_rate"
+    - "verification_accuracy"
+    - "cost_per_session"
+  
+  alerts:
+    high_response_time_threshold: 5.0  # seconds
+    low_quality_threshold: 0.7
+    high_corruption_risk_rate: 0.1  # 10% of sessions
+    grok_verification_failure_rate: 0.05  # 5% failure rate
+
+# Deployment configuration
+deployment:
+  # Environment-specific settings
+  development:
+    use_mock_responses: true
+    enable_debug_logging: true
+    skip_grok_verification: true
+    
+  staging:
+    use_mock_responses: false
+    enable_debug_logging: true
+    grok_shadow_mode: true  # Grok runs but doesn't affect responses
+    
+  production:
+    use_mock_responses: false
+    enable_debug_logging: false
+    grok_shadow_mode: false
+    enable_all_verifications: true
+
+# Security configuration
+security:
+  pii_scanning:
+    enabled: true
+    mask_before_grok: true  # Mask PII before sending to Grok
+    
+  audit_logging:
+    enabled: true
+    include_responses: true
+    retention_days: 90
+    
+  rate_limiting:
+    enabled: true
+    per_user_limits:
+      requests_per_hour: 100
+      corruption_warnings_per_day: 5

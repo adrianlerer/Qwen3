@@ -1,0 +1,316 @@
+# Integridai Hybrid AI System - Routing Configuration
+# Sistema Híbrido Integridai - Configuración de Enrutamiento
+
+# Smart routing system for optimal AI provider selection
+# Sistema de enrutamiento inteligente para selección óptima de proveedor de IA
+
+routing_engine:
+  version: "2.0"
+  description: "Enhanced routing with Grok 2.5 verification and anti-corruption features"
+  
+# Primary routing rules (evaluated in order)
+routing_rules:
+  
+  # 1. Critical Risk Override - Immediate Grok verification
+  - name: "critical_corruption_risk"
+    priority: 1
+    conditions:
+      corruption_risk_level: "critical"
+    actions:
+      primary_provider: "grok-2.5"
+      character_override: "inspector_grok"
+      enable_intervention: true
+      log_level: "critical"
+    
+  # 2. High Risk Routing - Grok verification with primary character  
+  - name: "high_corruption_risk"
+    priority: 2
+    conditions:
+      corruption_risk_level: "high"
+    actions:
+      primary_provider: "character_preferred"  # Use character's preferred provider
+      verification_provider: "grok-2.5"       # Add Grok verification
+      enable_cross_check: true
+      log_level: "warning"
+  
+  # 3. Corrupt Character Routing - Always use Kimi-K2
+  - name: "corrupt_characters"
+    priority: 3
+    conditions:
+      character: ["ricardo_corrupt", "sofia_enabler", "marcos_facilitator"]
+    actions:
+      primary_provider: "kimi-k2"
+      verification_provider: "grok-2.5"  # Verify corrupt character responses
+      enable_educational_warnings: true
+      corruption_resistance_tracking: true
+      
+  # 4. Verification Character - Direct to Grok
+  - name: "inspector_grok_character"
+    priority: 4
+    conditions:
+      character: "inspector_grok"
+    actions:
+      primary_provider: "grok-2.5"
+      add_attribution: true  # "Powered by xAI (Grok 2.5)"
+      response_format: "verification_structured"
+      
+  # 5. Ethical Characters - Provider preferences
+  - name: "ethical_characters_openai"
+    priority: 5
+    conditions:
+      character: ["catalina", "auditor"]
+      corruption_risk_level: ["low", "medium"]
+    actions:
+      primary_provider: "openai-gpt4"
+      fallback_provider: "qwen3-local"
+      
+  - name: "mentor_character"
+    priority: 6
+    conditions:
+      character: "mentor"
+      corruption_risk_level: ["low", "medium"]
+    actions:
+      primary_provider: "qwen3-local"
+      enable_thinking_mode: true
+      fallback_provider: "openai-gpt4"
+      
+  # 6. Temptation Character - Kimi for agentic behavior
+  - name: "alexis_temptation"
+    priority: 7
+    conditions:
+      character: "alexis" 
+      corruption_risk_level: ["low", "medium"]
+    actions:
+      primary_provider: "kimi-k2"
+      fallback_provider: "qwen3-local"
+      
+  # 7. Default routing based on context
+  - name: "long_context_routing"
+    priority: 8
+    conditions:
+      context_length: ">80000"
+    actions:
+      primary_provider: "kimi-k2"
+      reason: "long_context_optimization"
+      
+  - name: "real_time_routing" 
+    priority: 9
+    conditions:
+      response_time_requirement: "<1.5s"
+    actions:
+      primary_provider: "qwen3-local"
+      reason: "speed_optimization"
+      
+  - name: "cost_optimization"
+    priority: 10
+    conditions:
+      cost_mode: "minimal"
+    actions:
+      primary_provider: "qwen3-local"
+      reason: "cost_optimization"
+
+# Verification routing configuration
+verification:
+  # Cross-check routing
+  cross_check:
+    enabled: true
+    trigger_conditions:
+      - corruption_risk: ["high", "critical"]
+      - character_type: "corrupt"
+      - user_seeking_validation: true
+      - legal_claims_present: true
+      
+    verification_workflow:
+      # Step 1: Extract claims for verification
+      claim_extraction:
+        provider: "qwen3-local"  # Fast local processing
+        max_claims: 7
+        
+      # Step 2: Fact-check with Grok
+      fact_checking:
+        provider: "grok-2.5"
+        confidence_threshold: 0.7
+        include_legal_analysis: true
+        
+      # Step 3: Consolidate results
+      consolidation:
+        combine_responses: true
+        add_verification_notes: true
+        flag_inconsistencies: true
+
+# Provider health checking and failover
+health_monitoring:
+  check_interval: 30  # seconds
+  
+  health_checks:
+    openai-gpt4:
+      endpoint: "https://api.openai.com/v1/models"
+      timeout: 10
+      expected_status: 200
+      
+    kimi-k2:
+      endpoint: "https://api.moonshot.cn/v1/models"
+      timeout: 10 
+      expected_status: 200
+      
+    qwen3-local:
+      method: "model_loaded_check"
+      timeout: 5
+      
+    grok-2.5:
+      endpoint: "http://localhost:30000/health"
+      timeout: 15
+      expected_status: 200
+      gpu_memory_check: true
+      
+  failover_strategy:
+    # If primary provider fails, use fallback chain
+    automatic_failover: true
+    max_retries_per_provider: 2
+    circuit_breaker:
+      failure_threshold: 5  # failures in window
+      recovery_timeout: 300  # seconds
+      
+# Load balancing (for multiple instances)
+load_balancing:
+  strategy: "weighted_round_robin"
+  
+  weights:
+    openai-gpt4: 1.0
+    kimi-k2: 1.0  
+    qwen3-local: 2.0  # Higher weight for local model
+    grok-2.5: 0.5     # Lower weight for specialized verification
+    
+  health_based_weighting: true
+  response_time_weighting: true
+
+# Cost optimization routing
+cost_optimization:
+  budget_limits:
+    daily_budget: 100.0  # USD
+    per_session_budget: 5.0  # USD
+    
+  cost_routing_rules:
+    - budget_remaining: ">50%"
+      preferred_providers: ["openai-gpt4", "kimi-k2", "grok-2.5"]
+      
+    - budget_remaining: "25%-50%"
+      preferred_providers: ["kimi-k2", "qwen3-local"]
+      restrictions: ["limit_grok_verification"]
+      
+    - budget_remaining: "<25%"
+      preferred_providers: ["qwen3-local"]
+      restrictions: ["disable_paid_apis", "emergency_mode"]
+
+# Performance-based routing
+performance_routing:
+  sla_requirements:
+    response_time_p95: 3.0  # seconds
+    response_time_p99: 5.0  # seconds
+    availability: 99.5      # percent
+    
+  performance_based_decisions:
+    - condition: "avg_response_time > 4.0s"
+      action: "prefer_qwen3_local"
+      
+    - condition: "openai_rate_limited"
+      action: "route_to_kimi_or_qwen3"
+      
+    - condition: "grok_verification_slow"
+      action: "enable_shadow_mode"  # Run verification but don't wait
+
+# Context-aware routing
+context_routing:
+  # Scenario-based routing
+  scenario_routing:
+    procurement_scenarios: 
+      high_risk_providers: ["grok-2.5", "openai-gpt4"]
+      
+    conflict_of_interest:
+      preferred_providers: ["openai-gpt4", "qwen3-local"]
+      
+    whistleblowing_scenarios:
+      preferred_providers: ["qwen3-local", "grok-2.5"]  # Thinking mode + verification
+      
+  # User history-based routing  
+  user_history_routing:
+    corruption_warnings: ">2"
+    action: "mandatory_grok_verification"
+    
+    high_integrity_score: ">90"
+    action: "standard_routing"
+    
+    learning_mode: true
+    action: "educational_character_preference"
+
+# Emergency and safety routing
+emergency_routing:
+  # Real corruption attempt detected
+  real_corruption_detected:
+    immediate_actions:
+      - "log_security_incident"
+      - "notify_administrators"
+      - "route_to_intervention_specialist"
+      - "disable_corrupt_characters"
+    provider: "grok-2.5"  # Use most capable verification system
+    
+  # System under attack
+  security_incident:
+    lockdown_mode: true
+    allowed_providers: ["qwen3-local"]  # Only local, trusted model
+    disable_features: ["corrupt_characters", "verification_sharing"]
+
+# A/B testing and experimentation
+experimentation:
+  enabled: true
+  
+  experiments:
+    # Test Grok verification effectiveness
+    - name: "grok_verification_impact"
+      percentage: 10  # 10% of users
+      treatment: "enable_grok_for_medium_risk"
+      control: "standard_routing"
+      metrics: ["corruption_resistance", "user_satisfaction", "response_quality"]
+      
+    # Test routing optimization
+    - name: "smart_routing_v2"
+      percentage: 5
+      treatment: "ml_based_routing"  # Future: ML-based provider selection
+      control: "rule_based_routing"
+      metrics: ["response_time", "cost_efficiency", "user_engagement"]
+
+# Audit and compliance
+audit_routing:
+  compliance_logging:
+    log_routing_decisions: true
+    log_provider_performance: true
+    log_verification_results: true
+    
+  regulatory_compliance:
+    data_residency:
+      local_processing_preferred: true
+      cross_border_restrictions: ["grok_verification_data"]
+      
+    audit_trails:
+      routing_decision_logging: true
+      provider_selection_rationale: true
+      verification_chain_tracking: true
+
+# Monitoring and alerting
+monitoring:
+  routing_metrics:
+    - "routing_decision_latency"
+    - "provider_selection_accuracy" 
+    - "verification_effectiveness"
+    - "cost_per_routing_decision"
+    - "user_satisfaction_by_route"
+    
+  alerts:
+    - condition: "grok_verification_failures > 5%"
+      action: "notify_ops_team"
+      
+    - condition: "routing_latency > 100ms"
+      action: "investigate_performance"
+      
+    - condition: "cost_budget_exceeded"
+      action: "enable_emergency_cost_controls"
